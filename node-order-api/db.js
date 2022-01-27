@@ -17,68 +17,87 @@ async function connect() {
 }
 
 async function getAllOrders() {
-    const conn = await connect();
+    try {
+        const connection = await connect();
 
-    const query = `SELECT * FROM orders LIMIT 1000;`;
-    console.log(`Executando query: ${query}`);
+        const query = `SELECT * FROM orders LIMIT 1000;`;
+        console.log(`Executando query: ${query}`);
 
-    const [rows, fields] = await connection.execute(query);
-    console.log(`Rows: ${JSON.stringify(rows)}`);
-    return rows;
+        const [rows, fields] = await connection.execute(query);
+        console.log(`Rows: ${JSON.stringify(rows)}`);
+        return rows;
+    } catch (err) {
+        console.log("Erro SQL: " + err);
+        throw { code: 500, message: 'Erro inesperado ao buscar os pedidos' };
+    }
 }
 
 async function getOrderById(id) {
-    const conn = await connect();
+    try {
+        const connection = await connect();
 
-    const query = `SELECT * FROM orders WHERE id = "${id}";`;
-    console.log(`Executando query: ${query}`);
+        const query = `SELECT * FROM orders WHERE id = "${id}";`;
+        console.log(`Executando query: ${query}`);
 
-    const [rows, fields] = await connection.execute(query);
+        const [rows, fields] = await connection.execute(query);
 
-    return rows;
+        return rows;
+    } catch (err) {
+        console.log("Erro SQL: " + err);
+        throw { code: 500, message: 'Erro inesperado ao buscar pedido' };
+    }
 }
 
 async function getOrderByClientId(id) {
-    const conn = await connect();
+    try {
+        const connection = await connect();
 
-    const query = `SELECT * FROM orders WHERE client_id = "${id}";`;
-    console.log(`Executando query: ${query}`);
+        const query = `SELECT * FROM orders WHERE client_id = "${id}";`;
+        console.log(`Executando query: ${query}`);
 
-    const [rows, fields] = await connection.execute(query);
+        const [rows, fields] = await connection.execute(query);
 
-    return rows;
+        return rows;
+    } catch (err) {
+        console.log("Erro SQL: " + err);
+        throw { code: 500, message: 'Erro inesperado ao buscar pedido' };
+    }
 }
 
 async function updateOrderById(id, clientId, productId, amount) {
     try {
-        const conn = await connect();
+        const connection = await connect();
 
         const query = `UPDATE orders SET client_id = "${clientId}", product_id = "${productId}", amount = ${amount} WHERE id = "${id}";`;
         console.log(`Executando query: ${query}`);
 
-        const [rows] = await conn.execute(query);
+        const [rows] = await connection.execute(query);
         return rows;
     } catch (err) {
-        throw { code: 500, message: 'Erro inesperado ao tentar cadastrar pedido' };
+        throw { code: 500, message: 'Erro inesperado ao atualizar pedido' };
     }
 }
 
 async function deleteOrderById(id) {
-    const conn = await connect();
+    try {
+        const connection = await connect();
 
-    const query = `DELETE FROM orders WHERE id = "${id}";`;
-    console.log(`Executando query: ${query}`);
+        const query = `DELETE FROM orders WHERE id = "${id}";`;
+        console.log(`Executando query: ${query}`);
 
-    await connection.execute(query);
+        await connection.execute(query);
+    } catch (err) {
+        throw { code: 500, message: 'Erro inesperado ao deletar pedido' };
+    }
 }
 
 async function insertOrder(id, clientId, productId, amount) {
-    const conn = await connect();
-
-    const query = `INSERT INTO orders(id, client_id, product_id, amount) VALUES ("${id}", "${clientId}", "${productId}", ${amount});`;
-    console.log(`Executando query: ${query}`);
-
     try {
+        const connection = await connect();
+
+        const query = `INSERT INTO orders(id, client_id, product_id, amount) VALUES ("${id}", "${clientId}", "${productId}", ${amount});`;
+        console.log(`Executando query: ${query}`);
+
         await connection.execute(query);
     } catch (err) {
         if (err.errno === 1062) {

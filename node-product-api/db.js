@@ -13,66 +13,86 @@ async function connect() {
         database: 'finalProject',
         multipleStatements: true
     });
+
     console.log("Conectou no MySQL!");
     global.connection = connection;
     return connection;
 }
 
 async function getAllProducts() {
-    const conn = await connect();
+    try {
+        const connection = await connect();
 
-    const query = `SELECT * FROM products LIMIT 1000;`;
-    console.log(`Executando query: ${query}`);
+        const query = `SELECT * FROM products LIMIT 1000;`;
+        console.log(`Executando query: ${query}`);
 
-    const [rows, fields] = await connection.execute(query);
-    console.log(`Rows: ${JSON.stringify(rows)}`);
-    return rows;
+        const [rows, fields] = await connection.execute(query);
+        console.log(`Rows: ${JSON.stringify(rows)}`);
+        return rows;
+    } catch (err) {
+        console.log("Erro SQL: " + err);
+        throw { code: 500, message: 'Erro inesperado ao buscar produtos' };
+    }
 }
 
 async function getProductById(id) {
-    const conn = await connect();
+    try {
+        const connection = await connect();
 
-    const query = `SELECT * FROM products WHERE id = "${id}";`;
-    console.log(`Executando query: ${query}`);
+        const query = `SELECT * FROM products WHERE id = "${id}";`;
+        console.log(`Executando query: ${query}`);
 
-    const [rows, fields] = await connection.execute(query);
+        const [rows, fields] = await connection.execute(query);
 
-    return rows;
+        return rows;
+    } catch (err) {
+        console.log("Erro SQL: " + err);
+        throw { code: 500, message: 'Erro inesperado ao buscar produto' };
+    }
 }
 
 
 async function updateProductById(id, name, description, value) {
     try {
-        const conn = await connect();
+        const connection = await connect();
 
         const query = `UPDATE products SET name = "${name}", description = "${description}", value = ${value} WHERE id = "${id}";`;
         console.log(`Executando query: ${query}`);
 
-        const [rows] = await conn.execute(query);
+        const [rows] = await connection.execute(query);
         return rows;
     } catch (err) {
-        throw { code: 500, message: 'Erro inesperado ao tentar cadastrar usuário' };
+        console.log("Erro SQL: " + err);
+        throw { code: 500, message: 'Erro inesperado ao atualizar produto' };
     }
 }
 
 async function deleteProductById(id) {
-    const conn = await connect();
+    try {
+        const connection = await connect();
 
-    const query = `DELETE FROM products WHERE id = "${id}";`;
-    console.log(`Executando query: ${query}`);
+        const query = `DELETE FROM products WHERE id = "${id}";`;
+        console.log(`Executando query: ${query}`);
 
-    await connection.execute(query);
+        await connection.execute(query);
+    } catch (err) {
+        console.log("Erro SQL: " + err);
+        throw { code: 500, message: 'Erro inesperado ao deletar produto' };
+    }
 }
 
 async function insertProduct(name, description, value) {
-    const conn = await connect();
-
-    const query = `INSERT INTO products(id, name, description, value) VALUES ("${randomUUID()}", "${name}", "${description}", ${value});`;
-    console.log(`Executando query: ${query}`);
-
     try {
+        const connection = await connect();
+
+        const query = `INSERT INTO products(id, name, description, value) VALUES ("${randomUUID()}", "${name}", "${description}", ${value});`;
+        console.log(`Executando query: ${query}`);
+
         await connection.execute(query);
     } catch (err) {
+        console.log('Erro ao Inserir Produto')
+        console.log('err', err)
+
         if (err.errno === 1062) {
             throw { code: 400, message: 'Já existe um producte cadastrado com este usuário!' };
         } else {

@@ -74,7 +74,7 @@ async function deleteProductById(id) {
 
         await connection.execute(query);
     } catch (err) {
-        throw { code: 500, message: 'Erro inesperado ao deletar usuário' };
+        throw { code: 500, message: 'Erro inesperado ao deletar produto' };
     }
 }
 
