@@ -1,0 +1,12 @@
+FROM node:12.2.0
+
+WORKDIR /home/app
+ENV PATH /home/node_modules/bin:$PATH
+
+COPY . /home/app
+
+RUN npm config set prefix "/home/node_modules"
+RUN npm install -g @angular/cli@7.3.9
+RUN npm install
+
+CMD ng serve —-ssl true --ssl-key "./key.pem" --ssl-cert "./cert.pem" --watch=true --host=0.0.0.0
