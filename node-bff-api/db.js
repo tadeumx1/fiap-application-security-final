@@ -1,98 +1,98 @@
 const { randomUUID } = require('crypto');
 
 async function connect() {
-    if (global.connection && global.connection.state !== 'disconnected')
-        return global.connection;
+  if (global.connection && global.connection.state !== 'disconnected')
+    return global.connection;
 
-    const mysql = require("mysql2/promise");
-    const connection = await mysql.createConnection({
-        host: process.env.DB_HOST || 'localhost',
-        port: 3306,
-        user: 'test',
-        password: 'test',
-        database: 'finalProject',
-        multipleStatements: true
-    });
-    console.log("Conectou no MySQL!");
-    global.connection = connection;
-    return connection;
+  const mysql = require("mysql2/promise");
+  const connection = await mysql.createConnection({
+    host: process.env.DB_HOST || 'localhost',
+    port: 3306,
+    user: 'test',
+    password: 'test',
+    database: 'finalProject',
+    multipleStatements: true
+  });
+  console.log("Conectou no MySQL!");
+  global.connection = connection;
+  return connection;
 }
 
 async function getAllProducts() {
-    try {
-        const connection = await connect();
+  try {
+    const connection = await connect();
 
-        const query = `SELECT * FROM products LIMIT 1000;`;
-        console.log(`Executando query: ${query}`);
+    const query = `SELECT * FROM products LIMIT 1000;`;
+    console.log(`Executando query: ${query}`);
 
-        const [rows, fields] = await connection.execute(query);
-        console.log(`Retorno SQL Rows: ${JSON.stringify(rows)}`);
-        return rows;
-    } catch (err) {
-        console.log("Erro SQL: " + err);
-        throw { code: 500, message: 'Erro inesperado ao buscar produtos' };
-    }
+    const [rows, fields] = await connection.execute(query);
+    console.log(`Retorno SQL Rows: ${JSON.stringify(rows)}`);
+    return rows;
+  } catch (err) {
+    console.log("Erro SQL: " + err);
+    throw { code: 500, message: 'Erro inesperado ao buscar produtos' };
+  }
 }
 
 async function getProductById(id) {
-    try {
-        const connection = await connect();
+  try {
+    const connection = await connect();
 
-        const query = `SELECT * FROM products WHERE id = "${id}";`;
-        console.log(`Executando query: ${query}`);
+    const query = `SELECT * FROM products WHERE id = "${id}";`;
+    console.log(`Executando query: ${query}`);
 
-        const [rows, fields] = await connection.execute(query);
+    const [rows, fields] = await connection.execute(query);
 
-        return rows;
-    } catch (err) {
-        console.log("Erro SQL: " + err);
-        throw { code: 500, message: 'Erro inesperado ao buscar produto' };
-    }
+    return rows;
+  } catch (err) {
+    console.log("Erro SQL: " + err);
+    throw { code: 500, message: 'Erro inesperado ao buscar produto' };
+  }
 }
 
 
 async function updateProductById(id, name, description, value) {
-    try {
-        const connection = await connect();
+  try {
+    const connection = await connect();
 
-        const query = `UPDATE products SET name = "${name}", description = "${description}", value = ${value} WHERE id = "${id}";`;
-        console.log(`Executando query: ${query}`);
+    const query = `UPDATE products SET name = "${name}", description = "${description}", value = ${value} WHERE id = "${id}";`;
+    console.log(`Executando query: ${query}`);
 
-        const [rows] = await connection.execute(query);
-        return rows;
-    } catch (err) {
-        throw { code: 500, message: 'Erro inesperado ao tentar cadastrar usuário' };
-    }
+    const [rows] = await connection.execute(query);
+    return rows;
+  } catch (err) {
+    throw { code: 500, message: 'Erro inesperado ao tentar cadastrar usuário' };
+  }
 }
 
 async function deleteProductById(id) {
-    try {
-        const connection = await connect();
+  try {
+    const connection = await connect();
 
-        const query = `DELETE FROM products WHERE id = "${id}";`;
-        console.log(`Executando query: ${query}`);
+    const query = `DELETE FROM products WHERE id = "${id}";`;
+    console.log(`Executando query: ${query}`);
 
-        await connection.execute(query);
-    } catch (err) {
-        throw { code: 500, message: 'Erro inesperado ao deletar produto' };
-    }
+    await connection.execute(query);
+  } catch (err) {
+    throw { code: 500, message: 'Erro inesperado ao deletar produto' };
+  }
 }
 
 async function insertProduct(name, description, value) {
-    const connection = await connect();
+  const connection = await connect();
 
-    const query = `INSERT INTO products(id, name, description, value) VALUES ("${randomUUID()}", "${name}", "${description}", ${value});`;
-    console.log(`Executando query: ${query}`);
+  const query = `INSERT INTO products(id, name, description, value) VALUES ("${randomUUID()}", "${name}", "${description}", ${value});`;
+  console.log(`Executando query: ${query}`);
 
-    try {
-        await connection.execute(query);
-    } catch (err) {
-        if (err.errno === 1062) {
-            throw { code: 400, message: 'Já existe um producte cadastrado com este usuário!' };
-        } else {
-            throw { code: 500, message: 'Erro inesperado ao tentar cadastrar usuário' };
-        }
+  try {
+    await connection.execute(query);
+  } catch (err) {
+    if (err.errno === 1062) {
+      throw { code: 400, message: 'Já existe um producte cadastrado com este usuário!' };
+    } else {
+      throw { code: 500, message: 'Erro inesperado ao tentar cadastrar usuário' };
     }
+  }
 }
 
 module.exports = { getProductById, getAllProducts, insertProduct, updateProductById, deleteProductById }

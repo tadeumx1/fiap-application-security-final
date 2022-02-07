@@ -56,7 +56,7 @@
   "defaults": {
     "serve": {
       "sslKey": "./key.pem",
-      "sslCert": "./cert.pem",
+      "sslCert": "./cert.pem"
     },
     "styleExt": "css",
     "component": {}
